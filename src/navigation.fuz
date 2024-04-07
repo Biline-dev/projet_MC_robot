@@ -1,0 +1,71 @@
+// ----------------------------------------------------------------------------
+// File       : regleRobot0.fuz
+// Description: TP Controle flou - Robot : 1er essai
+// ----------------------------------------------------------------------------
+
+configuration
+{
+	et := min;
+	ou := max;
+	decodage := centre;
+	implication := larsen;
+	ainsi_que := max;
+}
+
+linguistique
+{
+	// Valeurs linguistiques de la variable linguistique DirecGoal
+    onRight := rampe_bas(-90.0,0);
+    inFront := triangle(-90.0,0.0,90.0);
+    onLeft  := rampe_haut(0.0,90.0);
+
+    // Valeurs linguistiques de la variable linguistique Sang
+    turnRight  := triangle(-200.0,-100.0,0.0);
+    straightOn := triangle(-100.0,0,100.0);
+    turnLeft   := triangle(0.0,100.0,200.0);
+
+    // Valeurs linguistiques de la variable linguistique DirecGoal
+    distance := rampe_haut(0.0,300.0);
+
+    // Valeurs linguistiques de la variable linguistique un obstacle
+    distance_loin_obstacle := rampe_haut(75.0,150.0);
+    distance_proche_obstacle := rampe_bas(0.0,150.0);
+    distance_trop_proche_obstacle := rampe_bas(0.0,100.0);
+
+    // Valeurs linguistiques de la variable linguistique Slin
+    avance := triangle(0,100.0,200.0);
+    recule := triangle(-100.0,-25.0,0);
+}
+
+
+regles
+{
+
+        // ----------------- Direction -----------------
+
+        //Le robot maintient sa direction vers l'objectif tant qu'il n'est pas dessus et tant qu'il n'y a pas d'obstacle à proximite
+        si DirecGoal est inFront et ObstFront est distance_loin_obstacle et ObstRight est distance_loin_obstacle et ObstLeft est distance_loin_obstacle alors Sang est straightOn;
+
+        //Le robot tourne vers la gauche si l'objectif est a gauche et si il n'y a pas d'obstacle
+        si DirecGoal est onLeft et ObstLeft est distance_loin_obstacle alors Sang est turnLeft;
+
+        //Le robot tourne vers la droite si l'objectif est a droite et si il n'y a pas d'obstacle
+        si DirecGoal est onRight et ObstRight est distance_loin_obstacle alors Sang est turnRight;
+        
+        //Le robot tourne a gauche si il y a un obstacle (C'est la direction de contournemant choisie)
+        si ObstFront est distance_proche_obstacle alors Sang est turnLeft;
+
+        //Permet au robot de longer l'obstacle
+        si ObstRight est distance_proche_obstacle alors Sang est straightOn;
+
+
+
+        // ----------------- Vitesse -----------------
+
+        //le robot avance tant que l'objetif est loin et tant qu'il n'y a pas d'obstacle en face
+        si DistGoal est distance et ObstFront est distance_loin_obstacle alors Slin est avance;
+
+        //le robot applique une vitesse inverse pour eviter une colision avec un obstacle proche
+        si ObstFront est distance_trop_proche_obstacle alors Slin est recule;
+}
+// ---End-Of-File-------------------------------------------------------------
